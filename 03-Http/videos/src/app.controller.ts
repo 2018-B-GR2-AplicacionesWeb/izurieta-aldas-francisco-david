@@ -8,12 +8,29 @@ import {
   HttpException,
   Query,
   Param,
+  Res,
+  Post,
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Observable, of } from 'rxjs';
 
 @Controller('Usuario') // Decoradores!
 export class AppController {
+  usuarios = [
+    {
+      nombre: 'Francisco',
+      id: 1,
+    },
+    {
+      nombre: 'David',
+      id: 2,
+    },
+    {
+      nombre: 'Diana',
+      id: 3,
+    },
+  ];
+
   @Get('saludar')
   saludar(
     @Query() queryParams,
@@ -55,5 +72,27 @@ export class AppController {
   saludarObservable(): Observable<string> {
     // metodo!
     return of('Hola mundo');
+  }
+
+  @Get('inicio')
+  inicio(@Res() response) {
+    response.render('inicio', {
+      nombre: 'Francisco',
+      arreglo: this.usuarios,
+    });
+  }
+
+  @Post('borrar/:idUsuario')
+  borrar(@Param('idUsuario') idUsuario, @Res() response) {
+    const indiceUsuario = this.usuarios.findIndex(
+      usuario => usuario.id === Number(idUsuario),
+    );
+
+    this.usuarios.splice(indiceUsuario, 1);
+
+    response.render('inicio', {
+      nombre: 'Adrian',
+      arreglo: this.usuarios,
+    });
   }
 }
