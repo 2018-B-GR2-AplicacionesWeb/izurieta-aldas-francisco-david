@@ -10,32 +10,20 @@ import {
   Param,
   Res,
   Post,
+  Body
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Observable, of } from 'rxjs';
-
-@Controller('Usuario') // Decoradores!
+import { Usuario, UsuarioService } from './usuario/usuario.service';
+@Controller() // Decoradores!
 export class AppController {
-  usuarios = [
-    {
-      nombre: 'Francisco',
-      id: 1,
-    },
-    {
-      nombre: 'David',
-      id: 2,
-    },
-    {
-      nombre: 'Diana',
-      id: 3,
-    },
-  ];
+  constructor(private readonly _usuarioService: UsuarioService) {}
 
   @Get('saludar')
   saludar(
     @Query() queryParams,
     @Query('nombre') nombre,
-    @Headers('seguridad') seguridad,
+    @Headers('seguridad') seguridad
   ): string {
     // metodo!
     return nombre;
@@ -54,9 +42,9 @@ export class AppController {
     return new Promise<string>((resolve, reject) => {
       throw new HttpException(
         {
-          mensaje: 'Error en despedirse',
+          mensaje: 'Error en despedirse'
         },
-        400,
+        400
       );
     });
   }
@@ -72,27 +60,5 @@ export class AppController {
   saludarObservable(): Observable<string> {
     // metodo!
     return of('Hola mundo');
-  }
-
-  @Get('inicio')
-  inicio(@Res() response) {
-    response.render('inicio', {
-      nombre: 'Francisco',
-      arreglo: this.usuarios,
-    });
-  }
-
-  @Post('borrar/:idUsuario')
-  borrar(@Param('idUsuario') idUsuario, @Res() response) {
-    const indiceUsuario = this.usuarios.findIndex(
-      usuario => usuario.id === Number(idUsuario),
-    );
-
-    this.usuarios.splice(indiceUsuario, 1);
-
-    response.render('inicio', {
-      nombre: 'Adrian',
-      arreglo: this.usuarios,
-    });
   }
 }
