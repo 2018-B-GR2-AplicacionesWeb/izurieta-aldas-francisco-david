@@ -10,11 +10,16 @@ import {
   Param,
   Res,
   Post,
-  Body
+  Body,
+  Session,
+  BadRequestException
 } from '@nestjs/common';
 import { AppService } from './app.service';
 import { Observable, of } from 'rxjs';
 import { Usuario, UsuarioService } from './usuario/usuario.service';
+import { ExpressionStatement } from 'typescript';
+import { Code } from 'typeorm';
+
 @Controller() // Decoradores!
 export class AppController {
   constructor(private readonly _usuarioService: UsuarioService) {}
@@ -23,8 +28,10 @@ export class AppController {
   saludar(
     @Query() queryParams,
     @Query('nombre') nombre,
-    @Headers('seguridad') seguridad
+    @Headers('seguridad') seguridad,
+    @Session() sesion
   ): string {
+    console.log('Sesion:', sesion);
     // metodo!
     return nombre;
   }
@@ -60,5 +67,28 @@ export class AppController {
   saludarObservable(): Observable<string> {
     // metodo!
     return of('Hola mundo');
+  }
+
+  @Post('login')
+  @HttpCode(200)
+  async loginMedoto(
+    @Body('username') username: string,
+    @Body('password') password: string,
+    @Res() response,
+    @Session() sesion
+  ) {
+    const identificado = await this._usuarioService.login(username, password);
+
+    if (identificado) {
+      sesion.usurio = username;
+      response.redirect('/saludar');
+    } else {
+      throw new BadRequestException({ mensaje: 'Error login' });
+    }
+  }
+
+  @Get('login')
+  loginVista(@Res() response) {
+    response.render('login');
   }
 }
