@@ -76,6 +76,22 @@ export class UsuarioService {
       return tieneAlgoEnElNombre || tieneAlgoEnLaBio;
     });
   }
+
+  async login(username: string, password: string): Promise<boolean> {
+    const usuarioEncontrado = await this._usuarioEntity.findOne({
+      where: { username: username }
+    });
+
+    if (usuarioEncontrado) {
+      if (usuarioEncontrado.password === password) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }
 
 export interface Usuario {
