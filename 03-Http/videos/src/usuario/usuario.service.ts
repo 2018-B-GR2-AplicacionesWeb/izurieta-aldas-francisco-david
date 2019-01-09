@@ -1,4 +1,7 @@
+import { UsuarioEntity } from './usuario-entity';
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, FindManyOptions } from 'typeorm';
 
 @Injectable()
 export class UsuarioService {
@@ -21,40 +24,44 @@ export class UsuarioService {
   ];
   registroActual = 4;
 
-  crear(nuevoUsuario: Usuario): Usuario {
-    nuevoUsuario.id = this.registroActual;
-    this.registroActual++;
-    this.usuarios.push(nuevoUsuario);
-    return nuevoUsuario;
+  constructor(
+    @InjectRepository(UsuarioEntity)
+    private readonly _usuarioEntity: Repository<UsuarioEntity>
+  ) {}
+
+  buscar(
+    parametros?: FindManyOptions<UsuarioEntity>
+  ): Promise<UsuarioEntity[]> {
+    return this._usuarioEntity.find(parametros);
   }
 
-  actualizar(idUsuario: number, nuevoUsuario: Usuario): Usuario {
-    const indiceUsuario = this.usuarios.findIndex(
-      usuario => usuario.id === idUsuario
-    );
-    this.usuarios[indiceUsuario] = nuevoUsuario;
-    return nuevoUsuario;
+  async crear(nuevoUsuario: Usuario): Promise<UsuarioEntity> {
+    const usuarioEntity = this._usuarioEntity.create(nuevoUsuario);
+
+    const usuarioCreado = await this._usuarioEntity.save(usuarioEntity);
+
+    return usuarioCreado;
   }
 
-  borrar(idUsuario: number): Usuario {
-    const indiceUsuario = this.usuarios.findIndex(
-      usuario => usuario.id === idUsuario
-    );
-    const usuarioBorrado = JSON.parse(
-      JSON.stringify(this.usuarios[indiceUsuario])
-    );
-    this.usuarios.splice(indiceUsuario, 1);
-    return usuarioBorrado;
+  actualizar(idUsuario: number, nuevoUsuario: Usuario): Promise<UsuarioEntity> {
+    nuevoUsuario.id = idUsuario;
+
+    const usuarioEntity = this._usuarioEntity.create(nuevoUsuario);
+
+    return this._usuarioEntity.save(usuarioEntity);
   }
 
-  buscarPorId(idUsuario: number) {
-    return (
-      this.usuarios
-        // .find(u=>u.id === idUsuario);
-        .find(usuario => {
-          return usuario.id === idUsuario;
-        })
-    );
+  borrar(idUsuario: number): Promise<UsuarioEntity> {
+    // CREA UNA INSTANCIA DE LA ENTIDAD
+    const usuarioEntityAEliminar = this._usuarioEntity.create({
+      id: idUsuario
+    });
+
+    return this._usuarioEntity.remove(usuarioEntityAEliminar);
+  }
+
+  buscarPorId(idUsuario: number): Promise<UsuarioEntity> {
+    return this._usuarioEntity.findOne(idUsuario);
   }
 
   buscarPorNombreOBiografia(busqueda: string): Usuario[] {
