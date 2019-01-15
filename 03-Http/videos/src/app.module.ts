@@ -15,7 +15,7 @@ import { LibroEntity } from './libro/libro-entity';
       port: 32768,
       username: 'francisco',
       password: '123456789',
-      database: 'videosDB',
+      database: 'videos',
       synchronize: true,
       dropSchema: false,
       entities: [UsuarioEntity, LibroEntity, PaginaEntity]
