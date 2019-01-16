@@ -16,16 +16,20 @@ export class UsuarioController {
     @Query('busqueda') busqueda: string
   ) {
     let mensaje; // undefined
+    let clase;
 
     if (accion && nombre) {
       switch (accion) {
         case 'actualizar':
+          clase = 'info';
           mensaje = `Registro ${nombre} actualizado`;
           break;
         case 'borrar':
+          clase = 'danger';
           mensaje = `Registro ${nombre} eliminado`;
           break;
         case 'crear':
+          clase = 'success';
           mensaje = `Registro ${nombre} creado`;
           break;
       }
@@ -51,7 +55,8 @@ export class UsuarioController {
     response.render('inicio', {
       nombre: 'Francisco',
       arreglo: usuarios,
-      mensaje: mensaje
+      mensaje: mensaje,
+      accion: clase
     });
   }
 
