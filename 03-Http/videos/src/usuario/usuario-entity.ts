@@ -27,10 +27,14 @@ export class UsuarioEntity {
   })
   biografia: string;
 
-  @Column()
+  @Column({
+    default: 'username'
+  })
   username: string;
 
-  @Column()
+  @Column({
+    default: 'password'
+  })
   password: string;
 
   @BeforeInsert()
