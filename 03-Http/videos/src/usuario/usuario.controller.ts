@@ -1,8 +1,10 @@
+import { UsuarioCreateDto } from './dto/usuario-create.dto';
 import { FindManyOptions } from 'typeorm';
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { Usuario, UsuarioService } from './usuario.service';
 import { UsuarioEntity } from './usuario-entity';
 import { Like } from 'typeorm';
+import { ValidationError, validate } from 'class-validator';
 
 @Controller('Usuario')
 export class UsuarioController {
@@ -89,11 +91,27 @@ export class UsuarioController {
 
   @Post('crear-usuario')
   async crearUsuarioFormulario(@Body() usuario: Usuario, @Res() response) {
-    await this._usuarioService.crear(usuario);
+    const usuarioValidado = new UsuarioCreateDto();
 
-    const parametrosConsulta = `?accion=crear&nombre=${usuario.nombre}`;
+    usuarioValidado.nombre = usuario.nombre;
+    usuarioValidado.biografia = usuario.biografia;
+    usuarioValidado.username = usuario.username;
+    usuarioValidado.password = usuario.password;
 
-    response.redirect('/Usuario/inicio' + parametrosConsulta);
+    const errores: ValidationError[] = await validate(usuarioValidado);
+
+    const hayErrores = errores.length > 0;
+
+    if (hayErrores) {
+      console.error(errores);
+      response.redirect('/Usuario/crear-usuario?error=Hay errores');
+    } else {
+      await this._usuarioService.crear(usuario);
+
+      const parametrosConsulta = `?accion=crear&nombre=${usuario.nombre}`;
+
+      response.redirect('/Usuario/inicio' + parametrosConsulta);
+    }
   }
 
   @Get('crear-usuario')

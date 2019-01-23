@@ -98,4 +98,6 @@ export interface Usuario {
   nombre: string;
   biografia: string;
   id: number;
+  username?: string;
+  password?: string;
 }
