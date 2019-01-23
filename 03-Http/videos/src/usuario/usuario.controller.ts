@@ -95,8 +95,8 @@ export class UsuarioController {
 
     usuarioValidado.nombre = usuario.nombre;
     usuarioValidado.biografia = usuario.biografia;
-    usuarioValidado.username = usuario.username;
-    usuarioValidado.password = usuario.password;
+    usuarioValidado.username = 'username';
+    usuarioValidado.password = 'password';
 
     const errores: ValidationError[] = await validate(usuarioValidado);
 
@@ -132,5 +132,10 @@ export class UsuarioController {
     }`;
 
     response.redirect('/Usuario/inicio' + parametrosConsulta);
+  }
+
+  @Get(':id')
+  obtenerPorId(@Param('id') idUsuario) {
+    return this._usuarioService.buscarPorId(+idUsuario);
   }
 }
