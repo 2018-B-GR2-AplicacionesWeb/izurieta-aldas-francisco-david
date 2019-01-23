@@ -235,6 +235,25 @@
       <%}%>
       <!-- <% var apellido = 'Izurieta' %> -->
       <!-- h1 -> Header 1 -->
+
+      <form action="">
+        <div class="form-group">
+          <label for="paises">Paises</label>
+          <select name="pais" id="paises" class="form-control">
+            <option value="1">Ecuador</option>
+            <option value="2">Argentina</option>
+            <option value="3">Japon</option>
+            <option value="4">Francia</option>
+            <option value="5">Autralia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="ciudades">Ciudades</label>
+          <select disabled name="ciudad" id="ciudades" class="form-control">
+          </select>
+        </div>
+      </form>
+
       <h1>Lista de Usuarios</h1>
 
       <form action="/Usuario/inicio" method="GET">
@@ -331,6 +350,75 @@
           container: 'body'
         });
       });
+    </script>
+    <script>
+      const selectPaises = document.getElementById('paises');
+      const selectCiudades = document.getElementById('ciudades');
+
+      const ciudades = [
+        {
+          idPais: 1,
+          nombre: 'Quito',
+          id: 1
+        },
+        {
+          idPais: 2,
+          nombre: 'Buenos Aires',
+          id: 2
+        },
+        {
+          idPais: 3,
+          nombre: 'Tokyo',
+          id: 3
+        },
+        {
+          idPais: 4,
+          nombre: 'Paris',
+          id: 4
+        },
+        {
+          idPais: 5,
+          nombre: 'Sidney',
+          id: 5
+        }
+      ];
+
+      selectPaises.onchange = evento => {
+        const paisActual = selectPaises.value;
+        selectCiudades.disabled = false;
+
+        const ciudadesFiltradas = ciudades.filter(ciudad => {
+          return ciudad.idPais === +paisActual;
+        });
+
+        const url = 'http://localhost:5000/Usuario';
+
+        $.get(
+          url + '/' + paisActual, // URL
+          datos => {
+            // Callback
+            const arregloCiudades = [datos];
+            matarHijos();
+            llenarCiudades(arregloCiudades);
+          }
+        );
+      };
+
+      function llenarCiudades(arregloCiudades) {
+        arregloCiudades.forEach(ciudad => {
+          const nuevaOption = document.createElement('option');
+          nuevaOption.value = ciudad.id;
+          nuevaOption.innerText = ciudad.nombre;
+          selectCiudades.appendChild(nuevaOption);
+        });
+      }
+
+      function matarHijos() {
+        //AKA eliminarLasOpciones
+        while (selectCiudades.firstChild) {
+          selectCiudades.removeChild(selectCiudades.firstChild);
+        }
+      }
     </script>
   </body>
 </html>
